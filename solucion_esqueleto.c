@@ -260,7 +260,7 @@ int gameBoardCheckAndClearLines(GameBoard* board) {
     int lines_cleared = 0;
     while (current != NULL) {
         int llena = 1;
-        for (int u = 0; u < CELL_SIZE; u++) {
+        for (int u = 0; u < GRID_COLS; u++) {
             if (current->cells[u] == 0) {
                 llena = 0;
             }
@@ -278,21 +278,24 @@ int gameBoardCheckAndClearLines(GameBoard* board) {
             } else {
                 prev->next = current->next;
             }
-            current = current->next;
-            row_idx++;
+            RowNode* siguiente = current->next;
             free(to_delete);
-            RowNode* new_row = (RowNode*) malloc(sizeof(RowNode));
-            if (new_row != NULL) {
-                for (int p = 0; p < CELL_SIZE; p++) {
-                    new_row->cells[p] = 0;
-                }
-                new_row->next = board->first_row;
-                board->first_row = new_row;
-            }
+            current = siguiente;
             lines_cleared++;
         } else {
             prev = current;
             current = current->next;
+        }
+        row_idx++;
+    }
+    for (int k = 0; k < lines_cleared; k++) {
+        RowNode* new_row = (RowNode*) malloc(sizeof(RowNode));
+        if (new_row != NULL) {
+            for (int p = 0; p < GRID_COLS; p++) {
+                new_row->cells[p] = 0;
+            }
+            new_row->next = board->first_row;
+            board->first_row = new_row;
         }
     }
     return lines_cleared;
