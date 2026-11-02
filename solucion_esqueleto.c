@@ -96,39 +96,24 @@ char* strDuplicate(char* src) {
 int strCompare(char* s1, char* s2) {
     // TODO: Devolver 0 si son iguales, 1 si s1 < s2, -1 si s1 > s2.
     //       Ojo: es la convencion INVERSA a strcmp.
-    int valora = 0;
-    int valorb = 0;
-    int score = 0;
     int i = 0;
-    while (s1[i] != '\0' && s2[i] != '\0'){
-        if ('A' <= s1[i] && s1[i] <= 'z' && (s1[i] <= 'a' || s1[i] >= 'Z')){
-            valora = s1[i];
-        }
-        if ('A' <= s2[i] && s2[i] <= 'z' && (s2[i] <= 'a' || s2[i] >= 'Z')){
-            valorb = s2[i];
-        }
-        if (valora > valorb){
-            score += valora;
-        }
-        else if (valora == valorb){
-            score = score;
-        }
-        else{
-            score -= valorb;
+    while (s1[i] != '\0' && s2[i] != '\0') {
+        if (s1[i] != s2[i]) {
+            if (s1[i] < s2[i]) {
+                return 1;
+            } else {
+                return -1;  
+            }
         }
         i++;
     }
-    while (s1[i] != '\0'){
-        valora = s1[i];
-        score += valora;
-        i++;
+    if (s1[i] == '\0' && s2[i] == '\0') {
+        return 0;   
+    } else if (s1[i] == '\0') {
+        return 1;   
+    } else {
+        return -1;  
     }
-    while (s2[i] != '\0'){
-        valorb = s2[i];
-        score += valorb;
-        i++;
-    }
-    return 0;
 }
 
 char* strConcatenate(char* src1, char* src2) {
@@ -513,6 +498,70 @@ void correrTests() {
     //    gameBoardCheckAndClearLines y comprobar que first_row es la fila nueva vacia y que
     //    la lista sigue teniendo 20 filas.
     // Liberar toda la memoria pedida en los tests (strings y tableros).
+    
+    // TESTS DE strDuplicate
+    // String vacío
+    char* copia1 = strDuplicate("");
+    assert(copia1 != NULL);
+    assert(copia1[0] == '\0');
+    free(copia1);
+    // String de un carácter
+    char* copia2 = strDuplicate("a");
+    assert(copia2 != NULL);
+    assert(copia2[0] == 'a');
+    assert(copia2[1] == '\0');
+    free(copia2);
+    // String de varios caracteres
+    char* copia3 = strDuplicate("hola");
+    assert(copia3 != NULL);
+    assert(copia3[0] == 'h');
+    assert(copia3[1] == 'o');
+    assert(copia3[2] == 'l');
+    assert(copia3[3] == 'a');
+    assert(copia3[4] == '\0');
+    free(copia3);
+    printf("Tests de strDuplicate correctos\n");
+
+    // TESTS DE strCompare
+    // Dos strings vacíos
+    assert(strCompare("", "") == 0);
+    // Dos strings de un carácter iguales
+    assert(strCompare("a", "a") == 0);
+    // Dos strings distintos en ambos órdenes
+    assert(strCompare("a", "b") == 1);
+    assert(strCompare("b", "a") == -1);
+    printf("Tests de strCompare correctos\n");
+
+    // TESTS DE strConcatenate:
+    // String vacío + string de 3 caracteres
+    char* s1 = strDuplicate("");
+    char* s2 = strDuplicate("abc");
+    char* resultado1 = strConcatenate(s1, s2);
+    assert(resultado1 != NULL);
+    assert(resultado1[0] == 'a');
+    assert(resultado1[1] == 'b');
+    assert(resultado1[2] == 'c');
+    assert(resultado1[3] == '\0');
+    free(resultado1);
+    // Dos strings de 5 caracteres
+    char* s3 = strDuplicate("hola ");
+    char* s4 = strDuplicate("mundo");
+    char* resultado2 = strConcatenate(s3, s4);
+    assert(resultado2 != NULL);
+    assert(resultado2[0] == 'h');
+    assert(resultado2[1] == 'o');
+    assert(resultado2[2] == 'l');
+    assert(resultado2[3] == 'a');
+    assert(resultado2[4] == ' ');
+    assert(resultado2[5] == 'm');
+    assert(resultado2[6] == 'u');
+    assert(resultado2[7] == 'n');
+    assert(resultado2[8] == 'd');
+    assert(resultado2[9] == 'o');
+    assert(resultado2[10] == '\0');
+    free(resultado2);
+    printf("Tests de strConcatenate correctos\n");
+
     // TEST Lógica de tablero 1: Queue
     GameBoard* tablero1 = gameBoardNew();
     assert(tablero1 != NULL);
