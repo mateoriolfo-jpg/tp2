@@ -170,6 +170,9 @@ GameBoard* gameBoardNew() {
     game_board -> tick_timer = 0;
     game_board -> current_piece.type = 0;
     game_board -> first_row = NULL; 
+    game_board -> queue_head = NULL;
+    game_board -> queue_tail = NULL;
+    game_board -> first_particle = NULL;
     RowNode* filas_creadas_array[20];
     int filas_creadas = 0;
     for(int i = 0; i < 20; i++){
