@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
+#include <assert.h>
 // ========= CONSTANTES DEL JUEGO =========
 #define SCREEN_WIDTH 500
 #define SCREEN_HEIGHT 800
@@ -510,9 +510,90 @@ void correrTests() {
     //    gameBoardCheckAndClearLines y comprobar que first_row es la fila nueva vacia y que
     //    la lista sigue teniendo 20 filas.
     // Liberar toda la memoria pedida en los tests (strings y tableros).
-    printf("Tests no implementados.\n");
-}
+    // TEST Lógica de tablero 1: Queue
+    GameBoard* tablero1 = gameBoardNew();
+    assert(tablero1 != NULL);
+    // Hacer Push 5 veces
+    for (int i = 0; i < 5; i++) {
+        gameBoardEnqueuePiece(tablero1, i);
+    }
+    int tipo;
+    // Hacer Pop 5 veces y comprobar el orden FIFO
+    for (int i = 0; i < 5; i++) {
+        assert(gameBoardDequeuePiece(tablero1, &tipo) == 1);
+        assert(tipo == i);
+    }
+    // Sexto Pop: debe devolver 0
+    assert(gameBoardDequeuePiece(tablero1, &tipo) == 0);
+    // La cola debe quedar vacía
+    assert(tablero1->queue_head == NULL);
+    assert(tablero1->queue_tail == NULL);
+    // Volver a insertar y extraer
+    gameBoardEnqueuePiece(tablero1, 3);
+    assert(gameBoardDequeuePiece(tablero1, &tipo) == 1);
+    assert(tipo == 3);
+    assert(tablero1->queue_head == NULL);
+    assert(tablero1->queue_tail == NULL);
+    gameBoardDelete(tablero1);
+    printf("Test 1 de lógica del tablero correcto\n");
 
+    //TEST lógica de tablero 2: Tablero
+    GameBoard* tablero2 = gameBoardNew();
+    assert(tablero2 != NULL);
+    // Buscar la última fila
+    RowNode* fila19 = tablero2->first_row;
+    for (int i = 0; i < 19; i++) {
+        fila19 = fila19->next;
+    }
+    // Llenar la fila 19
+    for (int i = 0; i < GRID_COLS; i++) {
+        fila19->cells[i] = 1;
+    }
+    // Eliminar las filas completas
+    int eliminadas2 = gameBoardCheckAndClearLines(tablero2);
+    assert(eliminadas2 == 1);
+    // Verificar que la primera fila está vacía
+    RowNode* primera2 = tablero2->first_row;
+    assert(primera2 != NULL);
+    for (int i = 0; i < GRID_COLS; i++) {
+        assert(primera2->cells[i] == 0);
+    }
+    // Verificar que siguen existiendo 20 filas
+    int cantidad2 = 0;
+    RowNode* actual2 = tablero2->first_row;
+    while (actual2 != NULL) {
+        cantidad2++;
+        actual2 = actual2->next;
+    }
+    assert(cantidad2 == GRID_ROWS);
+    gameBoardDelete(tablero2);
+    printf("Test 2 de lógica del tablero correcto\n");
+
+    //TEST 3: Tablero: eliminar filas 1 y 0
+       GameBoard* tablero3 = gameBoardNew();
+    assert(tablero3 != NULL);
+    // Obtener las primeras dos filas
+    RowNode* fila0 = tablero3->first_row;
+    RowNode* fila1 = fila0->next;
+    // Llenar ambas filas
+    for (int i = 0; i < GRID_COLS; i++) {
+        fila0->cells[i] = 1;
+        fila1->cells[i] = 1;
+    }
+    // Eliminar las filas completas
+    int eliminadas3 = gameBoardCheckAndClearLines(tablero3);
+    assert(eliminadas3 == 2);
+    // Verificar que siguen existiendo 20 filas
+    int cantidad3 = 0;
+    RowNode* actual3 = tablero3->first_row;
+    while (actual3 != NULL) {
+        cantidad3++;
+        actual3 = actual3->next;
+    }
+    assert(cantidad3 == GRID_ROWS);
+    gameBoardDelete(tablero3);
+    printf("Test 3 de lógica del tablero correcto\n");
+}
 // Compara contra "--test" sin depender de string.h ni del Ejercicio 1.
 int esFlagTest(char* arg) {
     char* flag = "--test";
