@@ -85,7 +85,8 @@ char* strDuplicate(char* src) {
     while(src[i] != '\0'){
         i++;
     }
-    char* p = (char*) malloc(sizeof(char)*i+1);
+    char* p = (char*) malloc(sizeof(char)*i+1); //Reserva memoria dinámica exacta: 
+    //tamaño de los caracteres contados (i) + 1 byte para el '\0'
     for(int n = 0; n < i; n++){
         p[n] = src[n];
     }
@@ -128,6 +129,8 @@ char* strConcatenate(char* src1, char* src2) {
         j++;
     }
     char* con = (char*) malloc(sizeof(char)*(j+i+1));
+    //Reserva un bloque de memoria exacto para la concatenación: 
+    //tamaño de src1[i] + tamaño de src2[j] + 1 byte para el carácter nulo('\0').
     for(int y = 0; y < j+i; y++){
         if(y < i){
             con[y] = src1[y];
@@ -137,6 +140,8 @@ char* strConcatenate(char* src1, char* src2) {
         }
     }
     con[j + i] = '\0';
+    free(src1);
+    free(src2);
     return con;
 }
 
@@ -180,6 +185,10 @@ GameBoard* gameBoardNew() {
         filas_creadas_array[i]->next = filas_creadas_array[i+1];
     }
     return game_board;
+    // Reserva dinámica de la estructura del tablero y construcción de la lista enlazada 
+    // de 20 filas (RowNode). Se gestiona la memoria de cada nodo individualmente con malloc, 
+    // se enlazan los punteros 'next' de forma secuencial y se asegura una limpieza 
+    // segura ante fallos de asignación.
 }
 
 void gameBoardDelete(GameBoard* board) {
@@ -210,6 +219,10 @@ void gameBoardDelete(GameBoard* board) {
         actual_part = siguiente_part;
     }
     free(board);
+    // Liberación recursiva y segura de memoria dinámica. Recorre las listas enlazadas 
+    // de filas (RowNode), piezas (PieceQueueNode) y partículas (ParticleNode) 
+    // empleando punteros auxiliares para evitar accesos inválidos, liberando cada nodo 
+    // individualmente y concluyendo con la estructura principal del GameBoard.
 }
 
 void gameBoardAddParticle(GameBoard* board, float x, float y, int color) {
@@ -228,6 +241,9 @@ void gameBoardAddParticle(GameBoard* board, float x, float y, int color) {
     part_node->life_timer = 40;
     part_node->next = board->first_particle;
     board->first_particle = part_node;
+    // Reserva memoria dinámica para un nuevo nodo de partícula (ParticleNode) 
+    // e implementa una inserción eficiente al inicio de la lista enlazada simple, 
+    // actualizando directamente el puntero first_particle del tablero.
 }
 
 int gameBoardCheckAndClearLines(GameBoard* board) {
@@ -284,6 +300,10 @@ int gameBoardCheckAndClearLines(GameBoard* board) {
         }
     }
     return lines_cleared;
+    // Valida y limpia las líneas completas del tablero recorriendo la lista enlazada 
+    // de filas. Emplea lógica avanzada de punteros para desenlazar y liberar de forma 
+    // segura (free) los nodos destruidos, generando nuevas filas vacías mediante malloc 
+    // y reinsertándolas al inicio (first_row) para mantener la integridad estructural del tablero.
 }
 
 void gameBoardEnqueuePiece(GameBoard* board, int type) {
@@ -302,6 +322,9 @@ void gameBoardEnqueuePiece(GameBoard* board, int type) {
         board->queue_tail->next = Piezafila;
         board->queue_tail = Piezafila;
     }
+    // Reserva memoria dinámica para un nuevo nodo de la cola de piezas (PieceQueueNode) 
+    // e implementa la inserción al final de la estructura (FIFO), gestionando 
+    // y actualizando de forma precisa los punteros de la cabeza (queue_head) y la cola (queue_tail).
 }
 
 int gameBoardDequeuePiece(GameBoard* board, int* out_type) {
@@ -320,6 +343,10 @@ int gameBoardDequeuePiece(GameBoard* board, int* out_type) {
     }
     free(borrador);
     return 1;
+    // Extrae el primer nodo de la cola de piezas (FIFO) empleando punteros auxiliares. 
+    // Actualiza con precisión la cabeza (queue_head) y la cola (queue_tail) de la estructura, 
+    // guarda el valor extraído en la variable de salida y libera de forma segura el nodo 
+    // mediante free() para evitar pérdidas de memoria.
 }
 
 // ========= LOGICA DE DIBUJADO Y COLISIONES (NO MODIFICAR) =========
